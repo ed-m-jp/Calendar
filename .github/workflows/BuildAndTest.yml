@@ -1,4 +1,4 @@
-name: .NET 7 & Vue.js Build and Test
+name: Build and Test
 
 on:
   push:
@@ -37,12 +37,7 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
-    
-    - name: setup .net core
-      uses: actions/setup-dotnet@v3
-      with:
-          dotnet-version: '7.x'
-          
+              
     - name: Setup Node.js
       uses: actions/setup-node@v2
       with:
