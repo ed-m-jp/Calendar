@@ -1,0 +1,20 @@
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    line-height: 1.5;
+    padding: 10px;
+    background-color: #f1f1f1;
+}
+
+.left-actions, .right-actions {
+    display: flex;
+    align-items: center;
+}
+
+.action-btn {
+    margin-right: 5px;
+}
+
+.right-actions > :last-child {
+    margin-left: 10px;
+}
