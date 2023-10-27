@@ -20,11 +20,19 @@ jobs:
           dotnet-version: '7.x'
 
     - name: Install dependencies
-      run: dotnet restore
+      run: |
+          # Exclude the specific project from build
+          if [ ! -f "*/Calendar.Web.esproj" ]; then
+            dotnet restore
+          fi
       working-directory: src/
     
     - name: build
-      run: dotnet build
+      run: |
+          # Exclude the specific project from build
+          if [ ! -f "*/Calendar.Web.esproj" ]; then
+            dotnet build
+          fi
       working-directory: src/
            
     # TODO implement test and run this after
