@@ -40,7 +40,7 @@ export default defineConfig({
         proxy: {
             '^/api': {
                 target: 'https://localhost:7013/',
-                secure: false // todo config file
+                secure: false
             }
         },
         port: 5173,
