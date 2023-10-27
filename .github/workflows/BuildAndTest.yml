@@ -12,44 +12,43 @@ jobs:
 
     steps:
     - name: checkout
-        uses: actions/checkout@v3
+      uses: actions/checkout@v3
 
     - name: setup .net core
-        uses: actions/setup-dotnet@v3
-        with:
+      uses: actions/setup-dotnet@v3
+      with:
           dotnet-version: '7.0'
           
     - name: build
         run: dotnet build
         working-directory: ./src/Calendar.sln
-
-    
+           
     # TODO implement test and run this after
     #- name: Test
     #  run: dotnet test --no-build --verbosity normal
 
   #build_vue:
-  #    runs-on: ubuntu-latest
+  #runs-on: ubuntu-latest
   #
-  #    steps:
-  #    - name: Checkout code
-  #      uses: actions/checkout@v2
+  #steps:
+  #- name: Checkout code
+  #  uses: actions/checkout@v2
   #
-  #    - name: Setup Node.js
-  #      uses: actions/setup-node@v2
-  #      with:
-  #        node-version: '16' # Adjust according to your project's requirement
+  #- name: Setup Node.js
+  #  uses: actions/setup-node@v2
+  #  with:
+  #    node-version: '16' # Adjust according to your project's requirement
   #
-  #    - name: Install dependencies
-  #      run: npm install
-  #      working-directory: src/Calendar.Web
+  #- name: Install dependencies
+  #  run: npm install
+  #  working-directory: src/Calendar.Web
   #
-  #    - name: Build Vue.js app
-  #      run: npm run build
-  #      working-directory: src/Calendar.Web
+  #- name: Build Vue.js app
+  #  run: npm run build
+  #  working-directory: src/Calendar.Web
   #
-  #    # Optionally, run tests if you have them set up for your Vue project
-  #    - name: Run Vue.js tests
-  #      run: npm run test
-  #      working-directory: src/Calendar.Web
+  ## Optionally, run tests if you have them set up for your Vue project
+  #- name: Run Vue.js tests
+  #  run: npm run test
+  #  working-directory: src/Calendar.Web
 
