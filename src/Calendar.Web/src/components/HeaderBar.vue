@@ -44,7 +44,7 @@
         },
         computed: {
             ...mapState('user', ['username']),
-            calendarViews() {
+            calendarViews(): typeof CALENDAR_VIEW {
                 return CALENDAR_VIEW;
             },
             isUserLoggedIn(): boolean {

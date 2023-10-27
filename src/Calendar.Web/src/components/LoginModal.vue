@@ -134,5 +134,5 @@
         },
     });
 
-    export default LoginModal as any;
+    export default LoginModal;
 </script>
