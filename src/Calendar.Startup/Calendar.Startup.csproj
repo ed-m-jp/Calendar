@@ -40,7 +40,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Calendar.Services\Calendar.Services.csproj" />
-    <ProjectReference Include="..\Calendar.shared\Calendar.Shared.csproj" />
+    <ProjectReference Include="..\Calendar.Shared\Calendar.Shared.csproj" />
     <ProjectReference Include="..\Calendar.Api\Calendar.Api.csproj" />
     <ProjectReference Include="..\Calendar.DataAccess\Calendar.DataAccess.csproj" />
   </ItemGroup>

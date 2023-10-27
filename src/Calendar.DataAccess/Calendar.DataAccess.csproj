@@ -27,7 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Calendar.shared\Calendar.Shared.csproj" />
+    <ProjectReference Include="..\Calendar.Shared\Calendar.Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>
