@@ -21,7 +21,7 @@ jobs:
           
     - name: build
       run: dotnet build
-      working-directory: ./src/Calendar.sln
+      working-directory: src/
            
     # TODO implement test and run this after
     #- name: Test
