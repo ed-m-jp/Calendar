@@ -38,6 +38,11 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
     
+    - name: setup .net core
+      uses: actions/setup-dotnet@v3
+      with:
+          dotnet-version: '7.x'
+          
     - name: Setup Node.js
       uses: actions/setup-node@v2
       with:
@@ -48,6 +53,6 @@ jobs:
       working-directory: src/Calendar.Web
     
     - name: Build Vue.js app
-      run: npm run build-only
+      run: npm run build
       working-directory: src/Calendar.Web
 
