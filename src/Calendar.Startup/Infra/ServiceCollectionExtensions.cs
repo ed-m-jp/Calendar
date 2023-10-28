@@ -1,8 +1,8 @@
 ﻿using Calendar.DataAccess;
 using Calendar.DataAccess.Interfaces;
 using Calendar.DataAccess.Repositories;
-using Calendar.ServiceLayer.Services;
-using Calendar.ServiceLayer.Interfaces;
+using Calendar.Services.Services;
+using Calendar.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Calendar.Shared.Entities;
 using Microsoft.AspNetCore.Identity;
@@ -90,6 +90,7 @@ namespace Calendar.Startup.Infra
             // app services
             services.AddScoped<IEventService, EventService>();
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<ITokenService, TokenService>();
 
             // build in services
             services.AddHttpContextAccessor();

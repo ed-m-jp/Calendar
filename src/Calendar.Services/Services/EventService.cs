@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Calendar.DataAccess.Interfaces;
-using Calendar.ServiceLayer.Interfaces;
+using Calendar.Services.Interfaces;
 using Calendar.shared.Entities;
 using Calendar.Shared.Models.WebApi.Requests;
 using Calendar.Shared.Models.WebApi.Response;
@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Calendar.ServiceLayer.Services
+namespace Calendar.Services.Services
 {
     public class EventService : IEventService
     {
@@ -47,7 +47,7 @@ namespace Calendar.ServiceLayer.Services
             var saveResult = await _EventRepository.AddAsync(newEventEntity);
             if (saveResult.IsError)
                 return ServiceResult<EventResponse>.Error(saveResult.ErrorMessage);
-            
+
             return ServiceResult<EventResponse>.Ok(_mapper.Map<EventResponse>(newEventEntity));
         }
 

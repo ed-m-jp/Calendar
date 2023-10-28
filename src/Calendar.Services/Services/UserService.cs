@@ -1,35 +1,28 @@
-﻿using Calendar.ServiceLayer.Interfaces;
+﻿using Calendar.Services.Interfaces;
 using Calendar.Shared.Entities;
-using Calendar.Shared.Extensions;
 using Calendar.Shared.Models.WebApi.Requests;
 using Calendar.Shared.Models.WebApi.Responses;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 
-namespace Calendar.ServiceLayer.Services
+namespace Calendar.Services.Services
 {
     public class UserService : IUserService
     {
-        private readonly UserManager<User>      _userManager;
-        private readonly IConfiguration         _configuration;
-        private readonly IHttpContextAccessor   _httpContextAccessor;
-        private readonly SignInManager<User>    _signInManager;
         private readonly ILogger<UserService>   _logger;
+        private readonly ITokenService          _tokenService;
+        private readonly SignInManager<User>    _signInManager;
+        private readonly UserManager<User>      _userManager;
 
-        public UserService(UserManager<User> userManager, IConfiguration configuration,IHttpContextAccessor httpContextAccessor,
-            SignInManager<User> signInManager, ILogger<UserService> logger)
+        public UserService(ILogger<UserService> logger,
+            ITokenService tokenService,
+            SignInManager<User> signInManager,
+            UserManager<User> userManager)
         {
-            _userManager = userManager;
-            _configuration = configuration;
-            _httpContextAccessor = httpContextAccessor;
-            _signInManager = signInManager;
             _logger = logger;
+            _tokenService = tokenService;
+            _userManager = userManager;
+            _signInManager = signInManager;
         }
 
         public async Task<ServiceResult<LoginResponse>> Login(LoginRequest loginRequest)
@@ -46,15 +39,17 @@ namespace Calendar.ServiceLayer.Services
                 if (!result)
                     return ServiceResult<LoginResponse>.BadRequest("Username or password is incorrect");
 
-                await _signInManager.SignInAsync(user, isPersistent: true);
+                var getTokenResult = _tokenService.GetJwtTokenForUser(user);
 
-                var token = GetJwtTokenForUser(user);
+                if (getTokenResult.IsOk)
+                {
+                    await _signInManager.SignInAsync(user, isPersistent: true);
+                    return ServiceResult<LoginResponse>.Ok(BuildLoginResponse(user, getTokenResult.Data!));
+                }
+                else if (getTokenResult.IsUnauthorized)
+                    return ServiceResult<LoginResponse>.Unauthorized(getTokenResult.ErrorMessage);
 
-                return ServiceResult<LoginResponse>.Ok(BuildLoginResponse(user, token));
-            }
-            catch (UnauthorizedAccessException ex)
-            {
-                return ServiceResult<LoginResponse>.Unauthorized(ex.Message);
+                return ServiceResult<LoginResponse>.Error("An error happened during login process. Please try again later.");
             }
             catch (Exception ex)
             {
@@ -70,7 +65,8 @@ namespace Calendar.ServiceLayer.Services
                 await _signInManager.SignOutAsync();
 
                 return ServiceResult.Ok();
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "Error trying to logout user.");
                 return ServiceResult.Error("An error happened during logout process.");
@@ -90,80 +86,23 @@ namespace Calendar.ServiceLayer.Services
                     return ServiceResult<LoginResponse>.BadRequest(string.Join(", ", createResult.Errors.Select(x => x.Description)));
                 }
 
-                await _signInManager.SignInAsync(newUser, isPersistent: true);
+                var getTokenResult = _tokenService.GetJwtTokenForUser(newUser);
 
-                var token = GetJwtTokenForUser(newUser);
+                if (getTokenResult.IsOk)
+                {
+                    await _signInManager.SignInAsync(newUser, isPersistent: true);
+                    return ServiceResult<LoginResponse>.Ok(BuildLoginResponse(newUser, getTokenResult.Data!));
+                }
+                else if (getTokenResult.IsUnauthorized)
+                    return ServiceResult<LoginResponse>.Unauthorized(getTokenResult.ErrorMessage);
 
-                return ServiceResult<LoginResponse>.Ok(BuildLoginResponse(newUser, token));
-            }
-            catch (UnauthorizedAccessException ex)
-            {
-                return ServiceResult<LoginResponse>.Unauthorized(ex.Message);
+                return ServiceResult<LoginResponse>.Error("An error happened during login process. Please try again later.");
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error trying to register new user.");
                 return ServiceResult<LoginResponse>.Error("An error happened during registration process. Please try again later.");
             }
-        }
-
-        private string GetJwtTokenForUser(User user)
-        {
-            var signingCredentials = GetTokenSigningCredentials();
-            var claims = GetUserClaims(user);
-            var tokenOptions = GenerateJwtTokenOptions(signingCredentials, claims);
-            
-            return new JwtSecurityTokenHandler().WriteToken(tokenOptions);            
-        }
-
-        private SigningCredentials GetTokenSigningCredentials()
-        {
-            var jwtConfig = _configuration.GetSection("jwtConfig");
-            var key = Encoding.UTF8.GetBytes(jwtConfig["Secret"]!);
-            var secret = new SymmetricSecurityKey(key);
-
-            return new SigningCredentials(secret, SecurityAlgorithms.HmacSha256);
-        }
-
-        private List<Claim> GetUserClaims(User user)
-        {
-            var encodedId = user.Id.ToPublicId();
-            var claims = new List<Claim>
-            {
-                new Claim(JwtRegisteredClaimNames.Sub, encodedId)
-            };
-
-            return claims;
-        }
-
-        private JwtSecurityToken GenerateJwtTokenOptions(SigningCredentials signingCredentials, List<Claim> claims)
-        {
-            var jwtSettings = _configuration.GetSection("JwtConfig");
-            var currentAudience = DetermineAudienceBasedOnRequestOrigin(jwtSettings);
-
-            var tokenOptions = new JwtSecurityToken
-            (
-                issuer: jwtSettings["validIssuer"],
-                audience: currentAudience,
-                claims: claims,
-                expires: DateTime.Now.AddMinutes(Convert.ToDouble(jwtSettings["expiresIn"])),
-                signingCredentials: signingCredentials
-            );
-
-            return tokenOptions;
-        }
-
-        private string DetermineAudienceBasedOnRequestOrigin(IConfigurationSection jwtSettings)
-        {
-            var origin = _httpContextAccessor.HttpContext.Request.Headers["Origin"].ToString();
-            var validAudiences = jwtSettings.GetSection("validAudiences").Get<List<string>>();
-
-            if (validAudiences!.Contains(origin))
-            {
-                return origin;
-            }
-
-            throw new UnauthorizedAccessException("Unauthorized origin.");
         }
 
         private LoginResponse BuildLoginResponse(User user, string token)
