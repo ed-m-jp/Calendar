@@ -14,13 +14,15 @@
 <script lang="ts">
     import { defineComponent } from 'vue';
     import FullCalendar from '@fullcalendar/vue3';
+    import type { CalendarOptions, EventApi, DateSelectArg, EventClickArg } from '@fullcalendar/core'
     import dayGridPlugin from '@fullcalendar/daygrid';
     import timeGridPlugin from '@fullcalendar/timegrid';
     import interactionPlugin from '@fullcalendar/interaction';
     import { INITIAL_EVENTS, createEventId } from '../scripts/EventHelper';
     import { mapState } from 'vuex';
+    import store from '../stores/Store';
 
-    const CalendarComponent = defineComponent({
+    export default defineComponent({
         components: {
             FullCalendar,
         },
@@ -37,8 +39,8 @@
                         center: 'title',
                         right: 'next'
                     },
-                    initialView: this.activeView,
-                    initialEvents: INITIAL_EVENTS,
+                    initialView: store.state.calendarView.activeView,
+                    initialEvents: INITIAL_EVENTS, // alternatively, use the `events` setting to fetch from a feed
                     editable: true,
                     selectable: true,
                     selectMirror: true,
@@ -52,15 +54,15 @@
                     eventChange:
                     eventRemove:
                     */
-                },
-                currentEvents: [],
+                } as CalendarOptions,
+                currentEvents: [] as EventApi[],
             }
         },
         computed: {
             ...mapState('calendarView', ['activeView']),
         },
         methods: {
-            handleDateSelect(selectInfo: any) {
+            handleDateSelect(selectInfo: DateSelectArg) {
                 let title = prompt('Please enter a new title for your event')
                 let calendarApi = selectInfo.view.calendar
 
@@ -76,12 +78,12 @@
                     })
                 }
             },
-            handleEventClick(clickInfo: any) {
+            handleEventClick(clickInfo: EventClickArg) {
                 if (confirm(`Are you sure you want to delete the event '${clickInfo.event.title}'`)) {
                     clickInfo.event.remove()
                 }
             },
-            handleEvents(events: any) {
+            handleEvents(events: EventApi[]) {
                 this.currentEvents = events
             },
         },
@@ -91,8 +93,6 @@
             },
         },
     });
-
-    export default CalendarComponent as any;
 </script>
 
 

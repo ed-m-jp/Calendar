@@ -37,7 +37,7 @@
     import type { componentData } from '../interfaces/LoginModalComponentDataType';
     import store from '../stores/Store';
 
-    const LoginModal = defineComponent({
+    export default defineComponent({
         props: {
             showModal: {
                 type: Boolean,
@@ -133,6 +133,4 @@
             },
         },
     });
-
-    export default LoginModal as any;
 </script>

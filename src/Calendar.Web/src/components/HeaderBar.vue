@@ -29,7 +29,7 @@
     import { mapState } from 'vuex';
     import store from '../stores/Store';
 
-    const HeaderBar = defineComponent({
+    export default defineComponent({
         name: 'HeaderBar',
         components: {
             LoginModal,
@@ -40,13 +40,11 @@
                 showLoginModal: false,
                 showLogoutModal: false,
                 activeView: store.state.calendarView.activeView,
+                calendarViews: CALENDAR_VIEW
             };
         },
         computed: {
             ...mapState('user', ['username']),
-            calendarViews() {
-                return CALENDAR_VIEW;
-            },
             isUserLoggedIn(): boolean {
                 return store.getters['user/isLoggedIn'];
             },
@@ -65,8 +63,6 @@
             }
         }
     });
-
-    export default HeaderBar;
 </script>
 
 <style scoped src="../assets/HeaderBar.css"></style>

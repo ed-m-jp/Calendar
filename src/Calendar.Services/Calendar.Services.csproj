@@ -16,7 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Calendar.DataAccess\Calendar.DataAccess.csproj" />
-    <ProjectReference Include="..\Calendar.shared\Calendar.Shared.csproj" />
+    <ProjectReference Include="..\Calendar.Shared\Calendar.Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>

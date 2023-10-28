@@ -8,8 +8,8 @@
             <v-card-text>{{ modalMessages.message }}</v-card-text>
             <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="green darken-1" text @click="logout">Yes</v-btn>
-                <v-btn color="red darken-1" text @click="closeModal">No</v-btn>
+                <v-btn color="green darken-1" text="Yes" @click="logout"></v-btn>
+                <v-btn color="red darken-1" text="No" @click="closeModal"></v-btn>
             </v-card-actions>
         </v-card>
     </v-dialog>
@@ -21,7 +21,7 @@
     import type { componentData } from '../interfaces/LogoutModalComponentDataType';
     import store from '../stores/Store';
 
-    const LogoutConfirmDialog = defineComponent({
+    export default defineComponent({
         props: {
             showModal: {
                 type: Boolean,
@@ -65,6 +65,4 @@
             },
         },
     });
-
-    export default LogoutConfirmDialog;
 </script>
