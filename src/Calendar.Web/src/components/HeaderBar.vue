@@ -40,13 +40,11 @@
                 showLoginModal: false,
                 showLogoutModal: false,
                 activeView: store.state.calendarView.activeView,
+                calendarViews: CALENDAR_VIEW
             };
         },
         computed: {
             ...mapState('user', ['username']),
-            calendarViews(): typeof CALENDAR_VIEW {
-                return CALENDAR_VIEW;
-            },
             isUserLoggedIn(): boolean {
                 return store.getters['user/isLoggedIn'];
             },
