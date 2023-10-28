@@ -27,9 +27,9 @@ jobs:
       run: dotnet build
       working-directory: src/
            
-    # TODO implement test and run this after
-    #- name: Test
-    #  run: dotnet test --no-build --verbosity normal
+    - name: test
+      run: dotnet test
+      working-directory: src/
 
   build_vue:
     runs-on: windows-latest
