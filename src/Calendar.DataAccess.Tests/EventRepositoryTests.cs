@@ -9,9 +9,9 @@ namespace Calendar.DataAccess.Tests
     [TestClass]
     public class EventRepositoryTests
     {
-        private AppDbContext _dbContext;
+        private AppDbContext                            _dbContext;
         private readonly Mock<ILogger<EventRepository>> _mockLogger;
-        private EventRepository _eventRepository;
+        private EventRepository                         _eventRepository;
 
         public EventRepositoryTests()
         {
@@ -21,6 +21,7 @@ namespace Calendar.DataAccess.Tests
         [TestInitialize]
         public void Setup()
         {
+            // set up db
             var options = new DbContextOptionsBuilder<AppDbContext>()
                 .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
                 .Options;

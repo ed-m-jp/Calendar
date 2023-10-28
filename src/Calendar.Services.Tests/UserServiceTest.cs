@@ -14,24 +14,25 @@ namespace Calendar.Service.Tests.Services
     [TestClass]
     public class UserServiceTests
     {
-        private readonly Mock<UserManager<User>> _mockUserManager;
-        private readonly Mock<SignInManager<User>> _mockSignInManager;
-        private readonly Mock<ILogger<UserService>> _mockLogger;
-        private readonly Mock<ITokenService> _mockTokenService;
+        private Mock<UserManager<User>>         _mockUserManager;
+        private Mock<SignInManager<User>>       _mockSignInManager;
+        private Mock<ILogger<UserService>>      _mockLogger;
+        private Mock<ITokenService>             _mockTokenService;
 
         private readonly User _user = new User { UserName = "testUsername" };
 
         const string TOKEN = "mockJwtToken";
 
-        public UserServiceTests()
+        [TestInitialize]
+        public void Setup()
         {
+            // Initialize Mocks
             _mockUserManager = MockHelper.MockUserManager<User>();
             _mockLogger = new Mock<ILogger<UserService>>();
             _mockSignInManager = new Mock<SignInManager<User>>(_mockUserManager.Object,
                 Mock.Of<IHttpContextAccessor>(),
                 Mock.Of<IUserClaimsPrincipalFactory<User>>(),
                 null, null, null);
-
             _mockTokenService = new Mock<ITokenService>();
         }
 
