@@ -19,7 +19,7 @@ namespace Calendar.Service.Tests.Services
         private Mock<ILogger<UserService>>      _mockLogger;
         private Mock<ITokenService>             _mockTokenService;
 
-        private readonly User _user = new User { UserName = "testUsername" };
+        private readonly User _user = new() { UserName = "testUsername" };
 
         const string TOKEN = "mockJwtToken";
 
