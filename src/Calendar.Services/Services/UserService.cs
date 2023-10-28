@@ -9,10 +9,10 @@ namespace Calendar.Services.Services
 {
     public class UserService : IUserService
     {
-        private readonly ILogger<UserService> _logger;
-        private readonly ITokenService _tokenService;
-        private readonly SignInManager<User> _signInManager;
-        private readonly UserManager<User> _userManager;
+        private readonly ILogger<UserService>   _logger;
+        private readonly ITokenService          _tokenService;
+        private readonly SignInManager<User>    _signInManager;
+        private readonly UserManager<User>      _userManager;
 
         public UserService(ILogger<UserService> logger,
             ITokenService tokenService,

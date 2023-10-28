@@ -12,9 +12,9 @@ namespace Calendar.Services.Services
 {
     public class EventService : IEventService
     {
-        private readonly IEventRepository _EventRepository;
-        private readonly ILogger<EventService> _logger;
-        private readonly IMapper _mapper;
+        private readonly IEventRepository       _EventRepository;
+        private readonly ILogger<EventService>  _logger;
+        private readonly IMapper                _mapper;
 
         public EventService(IEventRepository EventRepository,
                             ILogger<EventService> logger,

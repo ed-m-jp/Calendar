@@ -20,10 +20,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Calendar.Services", "Calendar.Services\Calendar.Services.csproj", "{0C9D6B59-792B-46E8-B7C8-8A8407A9EFD9}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{B3B9C266-938A-4714-9C9D-616C4A9FF314}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Calendar.DataAccess.Tests", "Calendar.DataAccess.Tests\Calendar.DataAccess.Tests.csproj", "{D3508945-057D-443D-BBCA-EA660E8A51D0}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

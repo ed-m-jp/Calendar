@@ -14,9 +14,9 @@ namespace Calendar.Services.Services
     public class TokenService : ITokenService
     {
 
-        private readonly IConfiguration _configuration;
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly ILogger<TokenService> _logger;
+        private readonly IConfiguration         _configuration;
+        private readonly IHttpContextAccessor   _httpContextAccessor;
+        private readonly ILogger<TokenService>  _logger;
 
         public TokenService(IConfiguration configuration, IHttpContextAccessor httpContextAccessor, ILogger<TokenService> logger)
         {
