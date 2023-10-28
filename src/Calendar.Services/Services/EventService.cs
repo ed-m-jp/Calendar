@@ -36,7 +36,7 @@ namespace Calendar.Services.Services
 
         public async Task<ServiceResult<EventResponse>> AddEventAsync([NotNull] EventCreateRequest createRequest, [NotNull] string userId)
         {
-            if (IsStartDateAfterOrEqualToEndDate(createRequest.StartTime, createRequest.EndTime) == false)
+            if (IsStartDateAfterOrEqualToEndDate(createRequest.StartTime, createRequest.EndTime) == true)
             {
                 return ServiceResult<EventResponse>.Unprocessable("Start time should be before end time.");
             }
@@ -75,7 +75,7 @@ namespace Calendar.Services.Services
                 // Apply the JSON Patch
                 patchDoc.ApplyTo(eventToUpdateDto);
 
-                if (IsStartDateAfterOrEqualToEndDate(eventToUpdateDto.StartTime, eventToUpdateDto.EndTime) == false)
+                if (IsStartDateAfterOrEqualToEndDate(eventToUpdateDto.StartTime, eventToUpdateDto.EndTime) == true)
                 {
                     return ServiceResult<EventResponse>.Unprocessable("Start time should be before end time.");
                 }
@@ -101,7 +101,7 @@ namespace Calendar.Services.Services
         public async Task<ServiceResult<EventResponse>> UpdateEventAsync([NotNull] int eventId,
             [NotNull] EventUpdateRequest updateRequest)
         {
-            if (IsStartDateAfterOrEqualToEndDate(updateRequest.StartTime, updateRequest.EndTime) == false)
+            if (IsStartDateAfterOrEqualToEndDate(updateRequest.StartTime, updateRequest.EndTime) == true)
             {
                 return ServiceResult<EventResponse>.Unprocessable("Start time should be before end time.");
             }

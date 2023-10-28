@@ -81,7 +81,6 @@ namespace Calendar.DataAccess.Repositories
                 _logger.LogCritical($"Failed to update entity of type [{typeof(T)}] for entity id : [{entity.Id}] and values : [{entityJson}].");
                 return RepositoryActionResult.Error(ex, ex.Message);
             }
-
         }
 
         public async Task<RepositoryActionResult> DeleteAsync(int entityId)
