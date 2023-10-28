@@ -1,7 +1,7 @@
 ﻿using Calendar.Shared.Models.WebApi.Requests;
 using Calendar.Shared.Models.WebApi.Responses;
 
-namespace Calendar.ServiceLayer.Interfaces
+namespace Calendar.Services.Interfaces
 {
     public interface IUserService
     {

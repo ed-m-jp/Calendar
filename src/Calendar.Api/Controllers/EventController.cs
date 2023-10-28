@@ -1,4 +1,4 @@
-﻿using Calendar.ServiceLayer.Interfaces;
+﻿using Calendar.Services.Interfaces;
 using Calendar.Shared.Models.WebApi.Requests;
 using Calendar.Shared.Models.WebApi.Response;
 using Microsoft.AspNetCore.Authorization;
