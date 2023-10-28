@@ -3,7 +3,7 @@ using Calendar.Shared.Models.WebApi.Response;
 using Microsoft.AspNetCore.JsonPatch;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Calendar.ServiceLayer.Interfaces
+namespace Calendar.Services.Interfaces
 {
     public interface IEventService
     {
@@ -14,7 +14,7 @@ namespace Calendar.ServiceLayer.Interfaces
         Task<ServiceResult<EventResponse>> GetEventbyIdAsync([NotNull] int eventId);
 
         Task<ServiceResult<EventResponse>> PartialUpdateEventAsync([NotNull] int eventId, [NotNull] JsonPatchDocument<EventUpdateRequest> patchDoc);
-        
+
         Task<ServiceResult<EventResponse>> UpdateEventAsync([NotNull] int eventId, [NotNull] EventUpdateRequest updateRequest);
 
         Task<ServiceResult<IReadOnlyList<PartialEventResponse>>> GetEventListForCurrentUserOnDate([NotNull] DateTime date, [NotNull] string userId);

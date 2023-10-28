@@ -1,6 +1,6 @@
 ﻿using Calendar.DataAccess.Infra;
 
-namespace Calendar.ServiceLayer
+namespace Calendar.Services
 {
     public class ServiceResult<T> where T : class
     {
@@ -84,9 +84,9 @@ namespace Calendar.ServiceLayer
             {
                 RepositoryActionStatus.Ok => Ok(data()),
                 RepositoryActionStatus.NotFound => NotFound(),
-                RepositoryActionStatus.Error => message != null ? Error(message) : (repositoryActionResult.Exception != null
+                RepositoryActionStatus.Error => message != null ? Error(message) : repositoryActionResult.Exception != null
                                         ? Error(repositoryActionResult.Exception)
-                                        : Error(repositoryActionResult.ErrorMessage)),
+                                        : Error(repositoryActionResult.ErrorMessage),
                 _ => throw new ArgumentOutOfRangeException(),
             };
         }
@@ -166,9 +166,9 @@ namespace Calendar.ServiceLayer
             {
                 RepositoryActionStatus.Ok => Ok(),
                 RepositoryActionStatus.NotFound => NotFound(),
-                RepositoryActionStatus.Error => message != null ? Error(message) : (repositoryActionResult.Exception != null
+                RepositoryActionStatus.Error => message != null ? Error(message) : repositoryActionResult.Exception != null
                                         ? Error(repositoryActionResult.Exception)
-                                        : Error(repositoryActionResult.ErrorMessage)),
+                                        : Error(repositoryActionResult.ErrorMessage),
                 _ => throw new ArgumentOutOfRangeException(),
             };
         }

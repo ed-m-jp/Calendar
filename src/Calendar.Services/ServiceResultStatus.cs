@@ -1,4 +1,4 @@
-﻿namespace Calendar.ServiceLayer
+﻿namespace Calendar.Services
 {
     //All possible result when calling a service method.
     public enum ServiceResultStatus
