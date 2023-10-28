@@ -29,7 +29,7 @@
     import { mapState } from 'vuex';
     import store from '../stores/Store';
 
-    const HeaderBar = defineComponent({
+    export default defineComponent({
         name: 'HeaderBar',
         components: {
             LoginModal,
@@ -65,8 +65,6 @@
             }
         }
     });
-
-    export default HeaderBar;
 </script>
 
 <style scoped src="../assets/HeaderBar.css"></style>
