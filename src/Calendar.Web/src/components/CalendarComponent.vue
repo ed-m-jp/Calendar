@@ -12,17 +12,27 @@
 </template>
 
 <script lang="ts">
+    // Vue Components
     import { defineComponent } from 'vue';
     import FullCalendar from '@fullcalendar/vue3';
-    import type { CalendarOptions, EventApi, DateSelectArg, EventClickArg, EventInput } from '@fullcalendar/core'
+    // FullCalendar Types & Plugins
+    import type {
+        CalendarOptions,
+        EventApi,
+        DateSelectArg,
+        EventClickArg,
+        EventInput,
+        Calendar
+    } from '@fullcalendar/core';
     import dayGridPlugin from '@fullcalendar/daygrid';
     import timeGridPlugin from '@fullcalendar/timegrid';
     import interactionPlugin from '@fullcalendar/interaction';
-    import type { Calendar } from '@fullcalendar/core';
+    // Store and Vuex related
     import { mapState } from 'vuex';
     import store from '../stores/Store';
-    import httpHelper from '../scripts/HttpHelper';
+    // Axios & HTTP Helper
     import type { CancelTokenSource } from 'axios';
+    import httpHelper from '../scripts/HttpHelper';
 
     export default defineComponent({
         components: {

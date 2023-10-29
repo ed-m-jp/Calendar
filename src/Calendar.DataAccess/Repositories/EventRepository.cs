@@ -10,7 +10,6 @@ namespace Calendar.DataAccess.Repositories
 {
     public class EventRepository : RepositoryBase<Event>, IEventRepository
     {
-
         public EventRepository([NotNull] AppDbContext dbContext, ILogger<EventRepository> logger) 
             : base(dbContext, logger) {}
 
@@ -19,13 +18,13 @@ namespace Calendar.DataAccess.Repositories
         {
             try
             {
-                var Events = await DbContext.Events
+                var events = await DbContext.Events
                     .AsNoTracking()
                     .GetEventForUserId(userId)
                     .GetEventsBetweenDates(startTime, endTime)
                     .ToListAsync();
 
-                return RepositoryActionResult<IReadOnlyList<Event>>.Ok(Events);
+                return RepositoryActionResult<IReadOnlyList<Event>>.Ok(events);
             }
             catch (Exception ex)
             {
@@ -39,13 +38,13 @@ namespace Calendar.DataAccess.Repositories
         {
             try
             {
-                var Events = await DbContext.Events
+                var events = await DbContext.Events
                     .AsNoTracking()
                     .GetEventForUserId(userId)
                     .GetEventsOnDate(date)
                     .ToListAsync();
 
-                return RepositoryActionResult<IReadOnlyList<Event>>.Ok(Events);
+                return RepositoryActionResult<IReadOnlyList<Event>>.Ok(events);
             }
             catch (Exception ex)
             {

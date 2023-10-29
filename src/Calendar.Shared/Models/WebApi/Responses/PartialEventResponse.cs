@@ -5,7 +5,6 @@ namespace Calendar.Shared.Models.WebApi.Response
 {
     public class PartialEventResponse : ResponseModelBase
     {
-
         [JsonPropertyName("id")]
         [JsonProperty("id")]
         public int Id { get; }

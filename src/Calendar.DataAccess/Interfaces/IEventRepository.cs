@@ -5,7 +5,6 @@ namespace Calendar.DataAccess.Interfaces
 {
     public interface IEventRepository
     {
-
         Task<RepositoryActionResult<Event>> GetByIdAsync(int entityId);
 
         Task<RepositoryActionResult> AddAsync(Event entity);

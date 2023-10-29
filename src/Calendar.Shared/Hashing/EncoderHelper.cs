@@ -4,7 +4,6 @@ namespace Calendar.ServiceLayer.Services
 {
     public static class EncoderHelper
     {
-
         private static readonly byte[] _salt = Encoding.UTF8.GetBytes("hJuVo cFg2B3 SDf7pa");
 
         public static string Encode(string data)

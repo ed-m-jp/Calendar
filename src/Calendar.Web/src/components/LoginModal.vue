@@ -32,10 +32,14 @@
 </template>
 
 <script lang="ts">
+    // Vue Components
     import { defineComponent } from 'vue';
+    // Utils & Helpers
     import httpHelper from '../scripts/HttpHelper';
-    import type { componentData } from '../interfaces/LoginModalComponentDataType';
+    // Store and Vuex related
     import store from '../stores/Store';
+    // Types & Interfaces
+    import type { componentData } from '../interfaces/LoginModalComponentDataType';
 
     export default defineComponent({
         props: {

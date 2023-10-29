@@ -22,12 +22,14 @@
 </template>
 
 <script lang="ts">
+    // Vue Components
     import { defineComponent } from 'vue';
     import LoginModal from './LoginModal.vue';
     import LogoutModal from './LogoutModal.vue';
+    // Store and Vuex related
+    import store from '../stores/Store';
     import { CALENDAR_VIEW } from '../stores/CalendarViewStore';
     import { mapState } from 'vuex';
-    import store from '../stores/Store';
 
     export default defineComponent({
         name: 'HeaderBar',

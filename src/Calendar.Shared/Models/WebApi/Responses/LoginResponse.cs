@@ -6,7 +6,6 @@ namespace Calendar.Shared.Models.WebApi.Responses
 {
     public class LoginResponse: ResponseModelBase
     {
-
         [JsonPropertyName("username")]
         [JsonProperty("username")]
         public string Username { get; }

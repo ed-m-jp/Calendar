@@ -46,7 +46,6 @@
             => new(errorMessage, RepositoryActionStatus.Error);
     }
 
-
     public class RepositoryActionResult<T> where T : class
     {
         public bool IsOk
@@ -108,6 +107,5 @@
 
         internal static RepositoryActionResult<T> Error(string errorMessage)
             => new(errorMessage, RepositoryActionStatus.Error);
-
     }
 }

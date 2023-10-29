@@ -4,7 +4,6 @@ namespace Calendar.DataAccess.Queries
 {
     internal static class EventQueries
     {
-
         internal static IQueryable<Event> GetEventForUserId(this IQueryable<Event> events, string userId)
             => events.Where(e => e.UserId == userId);
 
