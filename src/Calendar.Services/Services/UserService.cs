@@ -105,7 +105,7 @@ namespace Calendar.Services.Services
             }
         }
 
-        private LoginResponse BuildLoginResponse(User user, string token)
-            => new LoginResponse(user.UserName!, token);
+        private static LoginResponse BuildLoginResponse(User user, string token)
+            => new(user.UserName!, token);
     }
 }

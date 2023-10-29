@@ -16,6 +16,9 @@ namespace Calendar.shared.Entities
         public string Description { get; set; }
 
         [Required]
+        public bool AllDay { get; set; }
+
+        [Required]
         public DateTime StartTime { get; set; }
 
         [Required]

@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 namespace Calendar.Shared.Models.WebApi.Response
@@ -17,6 +18,10 @@ namespace Calendar.Shared.Models.WebApi.Response
         [JsonProperty("description")]
         public string Description { get; }
 
+        [JsonPropertyName("allDay")]
+        [JsonProperty("allDay")]
+        public bool AllDay { get; }
+
         [JsonPropertyName("startTime")]
         [JsonProperty("startTime")]
         public DateTime StartTime { get; }
@@ -25,11 +30,12 @@ namespace Calendar.Shared.Models.WebApi.Response
         [JsonProperty("endTime")]
         public DateTime EndTime { get; }
 
-        public EventResponse(int id, string title, string description, DateTime startTime, DateTime endTime)
+        public EventResponse(int id, string title, string description, bool allDay, DateTime startTime, DateTime endTime)
         {
             Id = id;
             Title = title;
             Description = description;
+            AllDay = allDay;
             StartTime = startTime;
             EndTime = endTime;
         }

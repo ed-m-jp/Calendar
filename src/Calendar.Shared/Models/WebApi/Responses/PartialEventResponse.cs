@@ -14,6 +14,10 @@ namespace Calendar.Shared.Models.WebApi.Response
         [JsonProperty("title")]
         public string Title { get; }
 
+        [JsonPropertyName("allDay")]
+        [JsonProperty("allDay")]
+        public bool AllDay { get; }
+
         [JsonPropertyName("startTime")]
         [JsonProperty("startTime")]
         public DateTime StartTime { get; }
@@ -22,10 +26,11 @@ namespace Calendar.Shared.Models.WebApi.Response
         [JsonProperty("endTime")]
         public DateTime EndTime { get; }
 
-        public PartialEventResponse(int id, string title, DateTime startTime, DateTime endTime)
+        public PartialEventResponse(int id, string title, bool allDay, DateTime startTime, DateTime endTime)
         {
             Id = id;
             Title = title;
+            AllDay = allDay;
             StartTime = startTime;
             EndTime = endTime;
         }
