@@ -4,21 +4,21 @@ import store from '../stores/Store';
 
 export default {
     getCancelToken(): CancelTokenSource {
-        (store.state as any).user.token;
         return axios.CancelToken.source();
     },
     getRequestHeader() {
         return {
             'Content-Type': 'application/json',
-            'Authorization': (store.state as any).user.token
+            'Authorization': 'Bearer ' + store.state.user.token
         };
     },
     async doGetHttpCall<T>(
         url: string,
         headers: object,
         cancelToken: CancelToken,
+        params: object
     ): Promise<T> {
-        return axios.get<T>(url, { headers, cancelToken })
+        return axios.get<T>(url, { headers, cancelToken, params })
             .then(response => {
                 return response.data;
             })

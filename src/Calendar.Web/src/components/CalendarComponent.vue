@@ -14,13 +14,15 @@
 <script lang="ts">
     import { defineComponent } from 'vue';
     import FullCalendar from '@fullcalendar/vue3';
-    import type { CalendarOptions, EventApi, DateSelectArg, EventClickArg } from '@fullcalendar/core'
+    import type { CalendarOptions, EventApi, DateSelectArg, EventClickArg, EventInput } from '@fullcalendar/core'
     import dayGridPlugin from '@fullcalendar/daygrid';
     import timeGridPlugin from '@fullcalendar/timegrid';
     import interactionPlugin from '@fullcalendar/interaction';
-    import { INITIAL_EVENTS, createEventId } from '../scripts/EventHelper';
+    import type { Calendar } from '@fullcalendar/core';
     import { mapState } from 'vuex';
     import store from '../stores/Store';
+    import httpHelper from '../scripts/HttpHelper';
+    import type { CancelTokenSource } from 'axios';
 
     export default defineComponent({
         components: {
@@ -40,7 +42,6 @@
                         right: 'next'
                     },
                     initialView: store.state.calendarView.activeView,
-                    initialEvents: INITIAL_EVENTS, // alternatively, use the `events` setting to fetch from a feed
                     editable: true,
                     selectable: true,
                     selectMirror: true,
@@ -49,17 +50,22 @@
                     select: this.handleDateSelect,
                     eventClick: this.handleEventClick,
                     eventsSet: this.handleEvents
-                    /* you can update a remote database when these fire:
-                    eventAdd:
-                    eventChange:
-                    eventRemove:
-                    */
                 } as CalendarOptions,
                 currentEvents: [] as EventApi[],
+                cancelTokenSource: null as CancelTokenSource|null,
             }
+        },
+        mounted() {
+            this.cancelTokenSource = httpHelper.getCancelToken();
         },
         computed: {
             ...mapState('calendarView', ['activeView']),
+            isUserLoggedIn(): boolean {
+                return store.getters['user/isLoggedIn'];
+            },
+            getCalendarApi(): Calendar {
+                return (this.$refs.fullCalendar as typeof FullCalendar).getApi();
+            },
         },
         methods: {
             handleDateSelect(selectInfo: DateSelectArg) {
@@ -69,79 +75,85 @@
                 calendarApi.unselect()
 
                 if (title) {
-                    calendarApi.addEvent({
-                        id: createEventId(),
-                        title,
-                        start: selectInfo.startStr,
-                        end: selectInfo.endStr,
-                        allDay: selectInfo.allDay
+                    const eventToAdd = {
+                        title: title,
+                        description: 'tmp description', // todo add this after creating the modal to add events
+                        allDay: selectInfo.allDay,
+                        startTime: selectInfo.startStr,
+                        endTime: selectInfo.endStr
+                    }
+                    httpHelper.doPostHttpCall<EventPartialApiResponse>(
+                        '/api/event',
+                        eventToAdd,
+                        httpHelper.getRequestHeader(),
+                        this.cancelTokenSource!.token
+                    ).then((resp) => {
+                        calendarApi.addEvent({
+                            id: resp.id.toString(),
+                            title: resp.title,
+                            start: resp.startTime,
+                            end: resp.endTime,
+                            allDay: resp.allDay,
+                        })
+                    }).catch((error) => {
+                        // todo display proper error message.
+                        console.log(error);
                     })
                 }
             },
             handleEventClick(clickInfo: EventClickArg) {
                 if (confirm(`Are you sure you want to delete the event '${clickInfo.event.title}'`)) {
-                    clickInfo.event.remove()
+                    httpHelper.doDeleteHttpCall<any>(
+                        `/api/event/${clickInfo.event.id}`,
+                        httpHelper.getRequestHeader(),
+                        this.cancelTokenSource!.token,
+                    ).then(() => {
+                        clickInfo.event.remove();
+                    }).catch((error) => {
+                        // todo display proper error message.
+                        console.log(error);
+                    })
                 }
             },
             handleEvents(events: EventApi[]) {
                 this.currentEvents = events
             },
+            transformToEventInput(apiResponseEvents: EventPartialApiResponse[]): EventInput[] {
+                return apiResponseEvents.map(event => ({
+                    id: event.id.toString(),
+                    title: event.title,
+                    start: event.startTime,
+                    end: event.endTime,
+                    allDay: event.allDay,
+                }));
+            },
+            async fetchAndLoadEvents() {
+                httpHelper.doGetHttpCall<EventPartialApiResponse[]>(
+                    '/api/event/events/range',
+                    httpHelper.getRequestHeader(),
+                    this.cancelTokenSource!.token,
+                    { 'startDate': '2023-10-1', 'endDate': '2023-11-1' }
+                ).then((resp) => {
+                    this.getCalendarApi.addEventSource(this.transformToEventInput(resp));
+                }).catch((error) => {
+                    // todo display proper error message.
+                    console.log(error);
+                });
+            }
         },
         watch: {
             activeView(newView) {
-                (this.$refs.fullCalendar as typeof FullCalendar).getApi().changeView(newView);
+                this.getCalendarApi.changeView(newView);
+            },
+            isUserLoggedIn(newValue) {
+                if (newValue === true) {
+                    this.fetchAndLoadEvents();
+                } else {
+                    this.getCalendarApi.removeAllEventSources();
+                }
             },
         },
     });
 </script>
 
-
-<style lang='css'>
-
-    h2 {
-        margin: 0;
-        font-size: 16px;
-    }
-
-    ul {
-        margin: 0;
-        padding: 0 0 0 1.5em;
-    }
-
-    li {
-        margin: 1.5em 0;
-        padding: 0;
-    }
-
-    b { /* used for event dates/times */
-        margin-right: 3px;
-    }
-
-    .demo-app {
-        display: flex;
-        min-height: 100%;
-        font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
-        font-size: 14px;
-    }
-
-    .demo-app-sidebar {
-        width: 300px;
-        line-height: 1.5;
-        background: #eaf9ff;
-        border-right: 1px solid #d3e2e8;
-    }
-
-    .demo-app-sidebar-section {
-        padding: 2em;
-    }
-
-    .demo-app-main {
-        flex-grow: 1;
-        padding: 3em;
-    }
-
-    .fc { /* the calendar root */
-        max-width: 100%;
-        margin: 0 auto;
-    }
-</style>
+<style scoped src='../assets/Calendar.css'></style>

@@ -1,4 +1,5 @@
-﻿using Calendar.Shared.Entities;
+﻿using Calendar.DataAccess;
+using Calendar.Shared.Entities;
 using Calendar.Startup.Seed;
 using Microsoft.AspNetCore.Identity;
 
@@ -14,8 +15,9 @@ namespace Calendar.Startup.Infra
                 try
                 {
                     var userManager = services.GetRequiredService<UserManager<User>>();
+                    var dbContext = services.GetRequiredService<AppDbContext>();
 
-                    DatabaseSeed.SeedAsync(userManager).Wait();
+                    DatabaseSeed.SeedAsync(userManager, dbContext).Wait();
                 }
                 catch (Exception ex)
                 {
