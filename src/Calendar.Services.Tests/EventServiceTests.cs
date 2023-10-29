@@ -41,6 +41,7 @@ namespace Calendar.Service.Tests.Services
             {
                 Title = "title",
                 Description = "description",
+                AllDay = false,
                 StartTime = DateTime.Now,
                 EndTime = DateTime.Now.AddMinutes(30),
                 UserId = Guid.NewGuid().ToString(),
@@ -48,6 +49,7 @@ namespace Calendar.Service.Tests.Services
             var eventResponse = new EventResponse(EVENT_ID,
                 entity.Title,
                 entity.Description,
+                entity.AllDay,
                 entity.StartTime,
                 entity.EndTime);
 
@@ -65,6 +67,7 @@ namespace Calendar.Service.Tests.Services
             Assert.AreEqual(eventResponse.Id, EVENT_ID);
             Assert.AreEqual(eventResponse.Title, entity.Title);
             Assert.AreEqual(eventResponse.Description, entity.Description);
+            Assert.AreEqual(eventResponse.AllDay, entity.AllDay);
             Assert.AreEqual(eventResponse.StartTime, entity.StartTime);
             Assert.AreEqual(eventResponse.EndTime, entity.EndTime);
         }
@@ -108,6 +111,7 @@ namespace Calendar.Service.Tests.Services
             {
                 Title = "Test Title",
                 Description = "Test Description",
+                AllDay = false,
                 StartTime = DateTime.Now,
                 EndTime = DateTime.Now.AddHours(1),
             };
@@ -136,6 +140,42 @@ namespace Calendar.Service.Tests.Services
         }
 
         [TestMethod]
+        public async Task AddEventAsync_ValidRequestAllDay_ReturnsEventResponse()
+        {
+            // Arrange
+            var createRequest = new EventCreateRequest
+            {
+                Title = "Test Title",
+                Description = "Test Description",
+                AllDay = true,
+                StartTime = DateTime.Now,
+                EndTime = DateTime.Now.AddDays(1),
+            };
+
+            var userId = "TestUserId";
+            var newEventEntity = new Event
+            {
+                Title = createRequest.Title,
+                Description = createRequest.Description,
+                StartTime = createRequest.StartTime.Date,
+                EndTime = createRequest.EndTime.Date,
+                UserId = userId,
+            };
+
+            _mockEventRepository.Setup(er => er.AddAsync(newEventEntity))
+                .ReturnsAsync(RepositoryActionResult.Ok());
+
+            _mockMapper.Setup(m => m.Map<Event>(createRequest))
+                .Returns(newEventEntity);
+
+            // Act
+            var result = await _eventService.AddEventAsync(createRequest, userId);
+
+            // Assert
+            Assert.IsTrue(result.IsOk);
+        }
+
+        [TestMethod]
         public async Task AddEventAsync_InvalidDates_ReturnsUnprocessable()
         {
             // Arrange
@@ -143,8 +183,32 @@ namespace Calendar.Service.Tests.Services
             {
                 Title = "Test Title",
                 Description = "Test Description",
+                AllDay = false,
                 StartTime = DateTime.Now.AddHours(1),
                 EndTime = DateTime.Now,
+            };
+
+            var userId = "TestUserId";
+
+            // Act
+            var result = await _eventService.AddEventAsync(createRequest, userId);
+
+            // Assert
+            Assert.IsTrue(result.IsUnprocessable);
+            Assert.AreEqual("Start time should be before end time.", result.ErrorMessage);
+        }
+
+        [TestMethod]
+        public async Task AddEventAsync_AllDayInvalidDates_ReturnsUnprocessable()
+        {
+            // Arrange
+            var createRequest = new EventCreateRequest
+            {
+                Title = "Test Title",
+                Description = "Test Description",
+                AllDay = true,
+                StartTime = DateTime.Now.Date,
+                EndTime = DateTime.Now.Date.AddHours(10),
             };
 
             var userId = "TestUserId";
@@ -165,6 +229,7 @@ namespace Calendar.Service.Tests.Services
             {
                 Title = "Test Title",
                 Description = "Test Description",
+                AllDay = false,
                 StartTime = DateTime.Now,
                 EndTime = DateTime.Now.AddHours(1),
             };
@@ -266,6 +331,7 @@ namespace Calendar.Service.Tests.Services
                 Id = EVENT_ID, 
                 Title = "OriginalTitle",
                 Description = "OriginalDescription",
+                AllDay = false,
                 StartTime = DateTime.Now,
                 EndTime = DateTime.Now.AddHours(1)
             };
@@ -286,6 +352,7 @@ namespace Calendar.Service.Tests.Services
             var updatedEventResponse = new EventResponse(EVENT_ID,
                 "NewTitle",
                 "NewDescription",
+                originalEvent.AllDay,
                 originalEvent.StartTime,
                 originalEvent.EndTime);
             _mockMapper.Setup(m => m.Map<EventResponse>(It.IsAny<Event>()))
@@ -308,6 +375,7 @@ namespace Calendar.Service.Tests.Services
                 Id = EVENT_ID,
                 Title = "Title",
                 Description = "Description",
+                AllDay = false,
                 StartTime = DateTime.Now,
                 EndTime = DateTime.Now.AddHours(1)
             };
@@ -322,8 +390,14 @@ namespace Calendar.Service.Tests.Services
                 .ReturnsAsync(RepositoryActionResult<Event>.Ok(originalEvent));
 
             _mockMapper.SetupSequence(m => m.Map<EventUpdateRequest>(originalEvent))
-                .Returns(new EventUpdateRequest { StartTime = DateTime.Now, EndTime = DateTime.Now.AddHours(1) })
-                .Returns(new EventUpdateRequest { StartTime = newStartTime, EndTime = newEndTime });
+                .Returns(new EventUpdateRequest { StartTime = originalEvent.StartTime, EndTime = originalEvent.EndTime });
+
+            _mockMapper.Setup(m => m.Map(It.IsAny<EventUpdateRequest>(), It.IsAny<Event>()))
+               .Callback<EventUpdateRequest, Event>((src, dest) =>
+               {
+                   dest.StartTime = src.StartTime;
+                   dest.EndTime = src.EndTime;
+               });
 
             _mockEventRepository.Setup(er => er.UpdateAsync(It.IsAny<Event>()))
                 .ReturnsAsync(RepositoryActionResult.Ok());
@@ -331,6 +405,7 @@ namespace Calendar.Service.Tests.Services
             var updatedEventResponse = new EventResponse(EVENT_ID,
                 originalEvent.Title,
                 originalEvent.Description,
+                originalEvent.AllDay,
                 newStartTime,
                 newEndTime);
             _mockMapper.Setup(m => m.Map<EventResponse>(It.IsAny<Event>()))
@@ -349,7 +424,11 @@ namespace Calendar.Service.Tests.Services
         public async Task PartialUpdateEventAsync_StartTimeAfterEndTime_Unprocessable()
         {
             // Arrange
-            var originalEvent = new Event { Id = EVENT_ID, StartTime = DateTime.Now, EndTime = DateTime.Now.AddHours(1) };
+            var originalEvent = new Event {
+                Id = EVENT_ID, 
+                StartTime = DateTime.Now,
+                EndTime = DateTime.Now.AddHours(1)
+            };
             var patchDocument = new JsonPatchDocument<EventUpdateRequest>();
             patchDocument.Replace(e => e.StartTime, DateTime.Now.AddHours(3));
             patchDocument.Replace(e => e.EndTime, DateTime.Now.AddHours(2));
@@ -358,8 +437,14 @@ namespace Calendar.Service.Tests.Services
                 .ReturnsAsync(RepositoryActionResult<Event>.Ok(originalEvent));
 
             _mockMapper.SetupSequence(m => m.Map<EventUpdateRequest>(originalEvent))
-                .Returns(new EventUpdateRequest { StartTime = DateTime.Now, EndTime = DateTime.Now.AddHours(1) })
-                .Returns(new EventUpdateRequest { StartTime = DateTime.Now.AddHours(3), EndTime = DateTime.Now.AddHours(2) });
+                .Returns(new EventUpdateRequest { StartTime =originalEvent.StartTime, EndTime = originalEvent.EndTime });
+
+            _mockMapper.Setup(m => m.Map(It.IsAny<EventUpdateRequest>(), It.IsAny<Event>()))
+               .Callback<EventUpdateRequest, Event>((src, dest) =>
+               {
+                   dest.StartTime = src.StartTime;
+                   dest.EndTime = src.EndTime;
+               });
 
             // Act
             var result = await _eventService.PartialUpdateEventAsync(EVENT_ID, patchDocument);
@@ -403,6 +488,7 @@ namespace Calendar.Service.Tests.Services
                 Id = EVENT_ID,
                 Title = "Original Title",
                 Description = "Original Description",
+                AllDay = false,
                 StartTime = DateTime.Now,
                 EndTime = DateTime.Now.AddHours(1)
             };
@@ -411,12 +497,14 @@ namespace Calendar.Service.Tests.Services
                 Id = EVENT_ID,
                 Title = updateRequest.Title,
                 Description = updateRequest.Description,
+                AllDay = false,
                 StartTime = updateRequest.StartTime,
                 EndTime = updateRequest.EndTime
             };
             var updatedEventResponse = new EventResponse(updatedEventEntity.Id,
                 updatedEventEntity.Title,
                 updatedEventEntity.Description,
+                updatedEventEntity.AllDay,
                 updatedEventEntity.StartTime,
                 updatedEventEntity.EndTime);
 
@@ -444,6 +532,15 @@ namespace Calendar.Service.Tests.Services
         public async Task UpdateEventAsync_InvalidTimeRange_ReturnsUnprocessable()
         {
             // Arrange
+            var originalEventEntity = new Event
+            {
+                Id = EVENT_ID,
+                Title = "Original Title",
+                Description = "Original Description",
+                AllDay = false,
+                StartTime = DateTime.Now,
+                EndTime = DateTime.Now.AddHours(1)
+            };
             var updateRequest = new EventUpdateRequest
             {
                 Title = "Title",
@@ -451,6 +548,9 @@ namespace Calendar.Service.Tests.Services
                 StartTime = DateTime.Now.AddHours(1),
                 EndTime = DateTime.Now
             };
+
+            _mockEventRepository.Setup(er => er.GetByIdAsync(EVENT_ID))
+                .ReturnsAsync(RepositoryActionResult<Event>.Ok(originalEventEntity));
 
             // Act
             var result = await _eventService.UpdateEventAsync(EVENT_ID, updateRequest);
@@ -502,10 +602,17 @@ namespace Calendar.Service.Tests.Services
                 Id = EVENT_ID,
                 Title = "Original Title",
                 Description = "Original Description",
+                AllDay = false,
                 StartTime = DateTime.Now,
                 EndTime = DateTime.Now.AddHours(1)
             };
-            var updateRequest = new EventUpdateRequest();
+            var updateRequest = new EventUpdateRequest
+            {
+                Title = "Title",
+                Description = "Description",
+                StartTime = DateTime.Now,
+                EndTime = DateTime.Now.AddHours(1)
+            };
             var errorMessage = $"Failed to Update Event for event id : [{EVENT_ID}].";
 
             _mockEventRepository.Setup(er => er.GetByIdAsync(EVENT_ID))
@@ -535,6 +642,7 @@ namespace Calendar.Service.Tests.Services
                     Id = EVENT_ID,
                     Title = "Title1",
                     Description = "Description1",
+                    AllDay = false,
                     StartTime = DateTime.Now,
                     EndTime = DateTime.Now.AddHours(1)
                 },
@@ -543,6 +651,7 @@ namespace Calendar.Service.Tests.Services
                     Id = EVENT_ID + 1,
                     Title = "Title2",
                     Description = "Description2",
+                    AllDay = false,
                     StartTime = DateTime.Now,
                     EndTime = DateTime.Now.AddHours(1)
                 },
@@ -551,10 +660,12 @@ namespace Calendar.Service.Tests.Services
             {
                 new PartialEventResponse(eventsFromDb[0].Id,
                     eventsFromDb[0].Title,
+                    eventsFromDb[0].AllDay,
                     eventsFromDb[0].StartTime,
                     eventsFromDb[0].EndTime),
                 new PartialEventResponse(eventsFromDb[1].Id,
                     eventsFromDb[1].Title,
+                    eventsFromDb[1].AllDay,
                     eventsFromDb[1].StartTime,
                     eventsFromDb[1].EndTime)
             };
@@ -606,6 +717,7 @@ namespace Calendar.Service.Tests.Services
                     Id = EVENT_ID,
                     Title = "Title1",
                     Description = "Description1",
+                    AllDay = false,
                     StartTime = DateTime.Now,
                     EndTime = DateTime.Now.AddHours(1)
                 },
@@ -614,6 +726,7 @@ namespace Calendar.Service.Tests.Services
                     Id = EVENT_ID + 1,
                     Title = "Title2",
                     Description = "Description2",
+                    AllDay = false,
                     StartTime = DateTime.Now,
                     EndTime = DateTime.Now.AddHours(1)
                 }
@@ -622,10 +735,12 @@ namespace Calendar.Service.Tests.Services
             {
                 new PartialEventResponse(eventsFromDb[0].Id,
                     eventsFromDb[0].Title,
+                    eventsFromDb[0].AllDay,
                     eventsFromDb[0].StartTime,
                     eventsFromDb[0].EndTime),
                 new PartialEventResponse(eventsFromDb[1].Id,
                     eventsFromDb[1].Title,
+                    eventsFromDb[1].AllDay,
                     eventsFromDb[1].StartTime,
                     eventsFromDb[1].EndTime)
             };

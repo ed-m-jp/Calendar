@@ -162,7 +162,7 @@ namespace Calendar.Api.Controllers
         [HttpPatch("{eventId}/partial")]
         public async Task<ActionResult<EventResponse>> PartialUpdateEvent([FromRoute] int eventId, [FromBody] JsonPatchDocument<EventUpdateRequest> jsonPatch)
         {
-            if (jsonPatch == null || jsonPatch.Operations.Count() == 0)
+            if (jsonPatch == null || jsonPatch.Operations.Count == 0)
                 return BadRequest();
 
             var updateResult = await _EventService.PartialUpdateEventAsync(eventId, jsonPatch);

@@ -36,6 +36,9 @@ namespace Calendar.Services.Services
 
         public async Task<ServiceResult<EventResponse>> AddEventAsync([NotNull] EventCreateRequest createRequest, [NotNull] string userId)
         {
+            (createRequest.StartTime, createRequest.EndTime)
+                = NormalizeStartAndEndTimes(createRequest.AllDay, createRequest.StartTime, createRequest.EndTime);
+
             if (IsStartDateAfterOrEqualToEndDate(createRequest.StartTime, createRequest.EndTime) == true)
             {
                 return ServiceResult<EventResponse>.Unprocessable("Start time should be before end time.");
@@ -75,11 +78,6 @@ namespace Calendar.Services.Services
                 // Apply the JSON Patch
                 patchDoc.ApplyTo(eventToUpdateDto);
 
-                if (IsStartDateAfterOrEqualToEndDate(eventToUpdateDto.StartTime, eventToUpdateDto.EndTime) == true)
-                {
-                    return ServiceResult<EventResponse>.Unprocessable("Start time should be before end time.");
-                }
-
                 // Now map the DTO back to the entity
                 _mapper.Map(eventToUpdateDto, eventFromDb.Entity);
             }
@@ -87,6 +85,14 @@ namespace Calendar.Services.Services
             {
                 _logger.LogError(ex, "Error partially updating the calendar event.");
                 return ServiceResult<EventResponse>.Unprocessable();
+            }
+
+            (eventFromDb.Entity!.StartTime, eventFromDb.Entity!.EndTime)
+                = NormalizeStartAndEndTimes(eventFromDb.Entity!.AllDay, eventFromDb.Entity!.StartTime, eventFromDb.Entity!.EndTime);
+
+            if (IsStartDateAfterOrEqualToEndDate(eventFromDb.Entity!.StartTime, eventFromDb.Entity!.EndTime) == true)
+            {
+                return ServiceResult<EventResponse>.Unprocessable("Start time should be before end time.");
             }
 
             // Save the updated entity to the DB
@@ -101,17 +107,20 @@ namespace Calendar.Services.Services
         public async Task<ServiceResult<EventResponse>> UpdateEventAsync([NotNull] int eventId,
             [NotNull] EventUpdateRequest updateRequest)
         {
-            if (IsStartDateAfterOrEqualToEndDate(updateRequest.StartTime, updateRequest.EndTime) == true)
-            {
-                return ServiceResult<EventResponse>.Unprocessable("Start time should be before end time.");
-            }
-
             var eventFromDb = await _EventRepository.GetByIdAsync(eventId);
 
             if (eventFromDb.IsNotFound)
                 return ServiceResult<EventResponse>.NotFound();
             if (eventFromDb.IsError)
                 return ServiceResult<EventResponse>.Error($"Failed to Update Event for event id : [{eventId}].");
+
+            (updateRequest.StartTime, updateRequest.EndTime)
+                    = NormalizeStartAndEndTimes(eventFromDb.Entity!.AllDay, updateRequest.StartTime, updateRequest.EndTime);
+
+            if (IsStartDateAfterOrEqualToEndDate(updateRequest.StartTime, updateRequest.EndTime) == true)
+            {
+                return ServiceResult<EventResponse>.Unprocessable("Start time should be before end time.");
+            }
 
             try
             {
@@ -156,7 +165,18 @@ namespace Calendar.Services.Services
                 () => _mapper.Map<IReadOnlyList<PartialEventResponse>>(getResult.Entity));
         }
 
+        private static (DateTime, DateTime) NormalizeStartAndEndTimes(bool allDay, DateTime startTime, DateTime endTime)
+        {
+            if (allDay == true)
+            {
+                startTime = startTime.Date;
+                endTime = endTime.Date;
+            }
+
+            return (startTime, endTime);
+        }
+
         private static bool IsStartDateAfterOrEqualToEndDate(DateTime startDate, DateTime endDate)
-            => startDate > endDate;
+            => startDate >= endDate;
     }
 }
