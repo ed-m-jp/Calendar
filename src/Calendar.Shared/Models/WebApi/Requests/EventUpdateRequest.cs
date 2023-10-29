@@ -5,7 +5,6 @@ namespace Calendar.Shared.Models.WebApi.Requests
 {
     public class EventUpdateRequest
     {
-
         [MaxLength(Constants.MaxLength.NAME)]
         public string Title { get; set; }
 

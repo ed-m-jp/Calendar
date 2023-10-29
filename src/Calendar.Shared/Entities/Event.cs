@@ -11,6 +11,7 @@ namespace Calendar.shared.Entities
         [MaxLength(Constants.MaxLength.NAME)]
         public string Title { get; set; }
 
+        // TODO make this not required
         [Required]
         [MaxLength(Constants.MaxLength.DESCRIPTION)]
         public string Description { get; set; }

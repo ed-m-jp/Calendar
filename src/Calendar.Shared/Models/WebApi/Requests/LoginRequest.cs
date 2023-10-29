@@ -4,7 +4,6 @@ namespace Calendar.Shared.Models.WebApi.Requests
 {
     public class LoginRequest
     {
-
         [Required]
         public string Username { get; set; }
 

@@ -8,7 +8,6 @@ namespace Calendar.DataAccess.Repositories
 {
     public abstract class RepositoryBase<T> where T : EntityBase
     {
-
         protected readonly AppDbContext DbContext;
         protected readonly ILogger _logger;
 

@@ -160,7 +160,8 @@ namespace Calendar.Api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
         [HttpPatch("{eventId}/partial")]
-        public async Task<ActionResult<EventResponse>> PartialUpdateEvent([FromRoute] int eventId, [FromBody] JsonPatchDocument<EventUpdateRequest> jsonPatch)
+        public async Task<ActionResult<EventResponse>> PartialUpdateEvent(
+            [FromRoute] int eventId, [FromBody] JsonPatchDocument<EventUpdateRequest> jsonPatch)
         {
             if (jsonPatch == null || jsonPatch.Operations.Count == 0)
                 return BadRequest();

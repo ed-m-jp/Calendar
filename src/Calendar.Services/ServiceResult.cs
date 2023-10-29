@@ -95,7 +95,6 @@ namespace Calendar.Services
 
     public class ServiceResult
     {
-
         public bool IsOk => Status == ServiceResultStatus.Ok;
 
         public bool IsNotFound => Status == ServiceResultStatus.NotFound;
@@ -120,7 +119,6 @@ namespace Calendar.Services
 
         public ServiceResultStatus Status { get; }
 
-
         private ServiceResult(Exception exception, ServiceResultStatus status)
         {
             Exception = exception;
@@ -137,7 +135,6 @@ namespace Calendar.Services
             ErrorMessage = errorMessage;
             Status = status;
         }
-
 
         internal static ServiceResult NotFound()
             => new(ServiceResultStatus.NotFound);
@@ -172,6 +169,5 @@ namespace Calendar.Services
                 _ => throw new ArgumentOutOfRangeException(),
             };
         }
-
     }
 }
