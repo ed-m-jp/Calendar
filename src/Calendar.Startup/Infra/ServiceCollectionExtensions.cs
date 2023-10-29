@@ -97,18 +97,5 @@ namespace Calendar.Startup.Infra
 
             return services;
         }
-
-        internal static IServiceCollection AddCookiesAuthentication(this IServiceCollection services)
-        {
-            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-                .AddCookie(options =>
-                {
-                    options.Cookie.Name = "AuthCookie";
-                    options.LoginPath = "/api/account/login";
-                    options.LogoutPath = "/api/account/logout";
-                });
-
-            return services;
-        }
     }
 }
