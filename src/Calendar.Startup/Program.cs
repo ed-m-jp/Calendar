@@ -36,8 +36,6 @@ builder.Services.AddServices();
 // Add mapping for entity and DTO
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
-builder.Services.AddCookiesAuthentication();
-
 var app = builder.Build();
 
 // Seed database
