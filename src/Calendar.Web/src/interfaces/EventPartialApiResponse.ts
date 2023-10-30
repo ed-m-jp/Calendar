@@ -1,4 +1,4 @@
-interface EventPartialApiResponse {
+export type EventPartialApiResponse = {
     id: number;
     title: string;
     allDay: boolean;

@@ -9,12 +9,15 @@
             </FullCalendar>
         </div>
     </div>
+    <EventCreateModal :dialog="addEventDialog" @update:dialog="updateDialog" :event="eventToCreate" @save="createEvent" />
 </template>
 
 <script lang="ts">
     // Vue Components
     import { defineComponent } from 'vue';
     import FullCalendar from '@fullcalendar/vue3';
+    // Dialog component
+    import EventCreateModal from './events/EventCreateModal.vue';
     // FullCalendar Types & Plugins
     import type {
         CalendarOptions,
@@ -31,12 +34,14 @@
     import { mapState } from 'vuex';
     import store from '../stores/Store';
     // Axios & HTTP Helper
-    import type { CancelTokenSource } from 'axios';
     import httpHelper from '../scripts/HttpHelper';
+    import type { CancelTokenSource } from 'axios';
+    import type { EventPartialApiResponse } from '../interfaces/EventPartialApiResponse'
 
     export default defineComponent({
         components: {
             FullCalendar,
+            EventCreateModal,
         },
         data() {
             return {
@@ -62,7 +67,9 @@
                     eventsSet: this.handleEvents
                 } as CalendarOptions,
                 currentEvents: [] as EventApi[],
-                cancelTokenSource: null as CancelTokenSource|null,
+                cancelTokenSource: null as CancelTokenSource | null,
+                addEventDialog: false as boolean,
+                eventToCreate: {} as object,
             }
         },
         mounted() {
@@ -79,37 +86,13 @@
         },
         methods: {
             handleDateSelect(selectInfo: DateSelectArg) {
-                let title = prompt('Please enter a new title for your event')
-                let calendarApi = selectInfo.view.calendar
-
-                calendarApi.unselect()
-
-                if (title) {
-                    const eventToAdd = {
-                        title: title,
-                        description: 'tmp description', // todo add this after creating the modal to add events
-                        allDay: selectInfo.allDay,
-                        startTime: selectInfo.startStr,
-                        endTime: selectInfo.endStr
-                    }
-                    httpHelper.doPostHttpCall<EventPartialApiResponse>(
-                        '/api/event',
-                        eventToAdd,
-                        httpHelper.getRequestHeader(),
-                        this.cancelTokenSource!.token
-                    ).then((resp) => {
-                        calendarApi.addEvent({
-                            id: resp.id.toString(),
-                            title: resp.title,
-                            start: resp.startTime,
-                            end: resp.endTime,
-                            allDay: resp.allDay,
-                        })
-                    }).catch((error) => {
-                        // todo display proper error message.
-                        console.log(error);
-                    })
-                }
+                selectInfo.view.calendar.unselect()
+                this.eventToCreate = {
+                    allDay: selectInfo.allDay,
+                    startTime: selectInfo.startStr,
+                    endTime: selectInfo.endStr,
+                };
+                this.addEventDialog = true;
             },
             handleEventClick(clickInfo: EventClickArg) {
                 if (confirm(`Are you sure you want to delete the event '${clickInfo.event.title}'`)) {
@@ -149,7 +132,19 @@
                     // todo display proper error message.
                     console.log(error);
                 });
-            }
+            },
+            updateDialog(val: boolean) {
+                this.addEventDialog = val;
+            },
+            createEvent(newEvent: EventPartialApiResponse) {
+                this.getCalendarApi.addEvent({
+                    id: newEvent.id.toString(),
+                    title: newEvent.title,
+                    start: newEvent.startTime,
+                    end: newEvent.endTime,
+                    allDay: newEvent.allDay,
+                });
+            },
         },
         watch: {
             activeView(newView) {
