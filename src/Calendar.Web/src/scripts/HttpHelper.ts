@@ -16,7 +16,7 @@ export default {
         url: string,
         headers: object,
         cancelToken: CancelToken,
-        params: object
+        params: object = {}
     ): Promise<T> {
         return axios.get<T>(url, { headers, cancelToken, params })
             .then(response => {

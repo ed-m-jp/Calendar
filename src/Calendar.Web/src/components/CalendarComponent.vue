@@ -9,7 +9,8 @@
             </FullCalendar>
         </div>
     </div>
-    <EventCreateModal :dialog="addEventDialog" @update:dialog="updateDialog" :event="eventToCreate" @save="createEvent" />
+    <EventCreateModal :dialog="showEventCreateDialog" :event="eventToCreate" @update:dialog="updateShowCreateEventDialog" @save="createEvent" />
+    <EventDetailsModal :dialog="showEventDetailsDialog" :eventId="eventId" @update:dialog="updateShowEventDetailsDialog" />
 </template>
 
 <script lang="ts">
@@ -18,6 +19,7 @@
     import FullCalendar from '@fullcalendar/vue3';
     // Dialog component
     import EventCreateModal from './events/EventCreateModal.vue';
+    import EventDetailsModal from './events/EventDetailsModal.vue';
     // FullCalendar Types & Plugins
     import type {
         CalendarOptions,
@@ -42,6 +44,7 @@
         components: {
             FullCalendar,
             EventCreateModal,
+            EventDetailsModal,
         },
         data() {
             return {
@@ -57,7 +60,7 @@
                         right: 'next'
                     },
                     initialView: store.state.calendarView.activeView,
-                    editable: true,
+                    editable: false, // TODO: allow drag and drop and rezise 
                     selectable: true,
                     selectMirror: true,
                     dayMaxEvents: true,
@@ -68,8 +71,10 @@
                 } as CalendarOptions,
                 currentEvents: [] as EventApi[],
                 cancelTokenSource: null as CancelTokenSource | null,
-                addEventDialog: false as boolean,
+                showEventCreateDialog: false as boolean,
+                showEventDetailsDialog: false as boolean,
                 eventToCreate: {} as object,
+                eventId: 0 as number,
             }
         },
         mounted() {
@@ -92,21 +97,11 @@
                     startTime: selectInfo.startStr,
                     endTime: selectInfo.endStr,
                 };
-                this.addEventDialog = true;
+                this.showEventCreateDialog = true;
             },
             handleEventClick(clickInfo: EventClickArg) {
-                if (confirm(`Are you sure you want to delete the event '${clickInfo.event.title}'`)) {
-                    httpHelper.doDeleteHttpCall<any>(
-                        `/api/event/${clickInfo.event.id}`,
-                        httpHelper.getRequestHeader(),
-                        this.cancelTokenSource!.token,
-                    ).then(() => {
-                        clickInfo.event.remove();
-                    }).catch((error) => {
-                        // todo display proper error message.
-                        console.log(error);
-                    })
-                }
+                this.eventId = Number(clickInfo.event.id);
+                this.showEventDetailsDialog = true;
             },
             handleEvents(events: EventApi[]) {
                 this.currentEvents = events
@@ -133,8 +128,11 @@
                     console.log(error);
                 });
             },
-            updateDialog(val: boolean) {
-                this.addEventDialog = val;
+            updateShowCreateEventDialog(val: boolean) {
+                this.showEventCreateDialog = val;
+            },
+            updateShowEventDetailsDialog(val: boolean) {
+                this.showEventDetailsDialog = val;
             },
             createEvent(newEvent: EventPartialApiResponse) {
                 this.getCalendarApi.addEvent({
