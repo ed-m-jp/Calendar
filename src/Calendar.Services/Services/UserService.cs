@@ -82,9 +82,7 @@ namespace Calendar.Services.Services
                 var createResult = await _userManager.CreateAsync(newUser, registerRequest.Password);
 
                 if (!createResult.Succeeded)
-                {
                     return ServiceResult<LoginResponse>.BadRequest(string.Join(", ", createResult.Errors.Select(x => x.Description)));
-                }
 
                 var getTokenResult = _tokenService.GetJwtTokenForUser(newUser);
 
