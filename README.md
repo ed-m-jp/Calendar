@@ -1,8 +1,39 @@
-# Calendar
-A simple, self-made calendar app, crafted for personal enjoyment. It provides basic calendar and event functionalities to help you manage your calendar and schedule events effortlessly, without the complexities of mainstream alternatives.
+# Calendar App
 
+## Table of Contents
+
+- [The app](#the-app)
+- [Documentation](#documentation)
+- [Installation](#installation)
+  - [Prerequisites:](#prerequisites)
+  - [Steps:](#steps)
+- [Questions or Issues?](#questions-or-issues)
+- [Appendix](#appendix)
+- [Authors](#authors)
+
+
+# The app
 > **Warning**
-> This is a work in progress and some features are still missing at the moment.
+> This is a work in progress. Some features are still missing, and the UI seen in the screenshot is subject to change.
+
+A simple, self-made calendar app crafted for personal enjoyment. It offers basic calendar and event functionalities, allowing you to manage your calendar and schedule events effortlessly without the complexities of mainstream alternatives.
+
+- **Month View**: Get a broad perspective of your entire month. Ideal for longer-term planning.
+  ![Month View](assets/MonthlyView.png)
+  
+- **Week View**: If a monthly schedule feels too overwhelming, why not consider weekly scheduling instead?
+  ![Week View](assets/WeeklyView.png)
+  
+- **Day View**: Dive deep into your day's agenda.
+  ![Day View](assets/DailyView.png)
+
+- **Create New Event**: Start from scratch. Input your event details and create it.
+  
+  ![Create New Event Modal](assets/EventCreateModal.png)
+  
+- **Event Details**: Once an event is set, get all the information at a glance with a simple click.
+  
+  ![Event Details Modal](assets/EventDetailsModal.png)
 
 ## Documentation
 
