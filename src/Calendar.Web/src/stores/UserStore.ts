@@ -1,5 +1,12 @@
 import type { ActionContext } from 'vuex';
 
+/**
+ * User Store:
+ * - Manages the user's state, including username and authentication token.
+ * - Provides getters to determine if a user is logged in.
+ * - Includes mutations to update or clear the user's information.
+ * - Actions available for committing the respective mutations.
+ */
 export type UserState = {
     username: string | null;
     token: string | null;

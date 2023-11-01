@@ -4,6 +4,11 @@ import { calendarViewStore } from './CalendarViewStore';
 import type { UserState } from './UserStore';
 import type { CalendarViewState } from './CalendarViewStore';
 
+/**
+ * Root Store:
+ * - Integrates the individual store modules.
+ * - Initializes the store with the integrated modules.
+ */
 export type RootState = {
     calendarView: CalendarViewState;
     user: UserState;

@@ -85,6 +85,7 @@
             this.cancelTokenSource = httpHelper.getCancelToken();
         },
         computed: {
+            // Determines type of date input (full date or date-time) based on whether the event is all day.
             dateInputType() {
                 return this.newEvent.allDay ? 'date' : 'datetime-local';
             },
@@ -94,8 +95,10 @@
                 this.$emit('update:dialog', false);
             },
             async onSubmit() {
+                // Validate the form.
                 const validationResult = await (this.$refs.form as any).validate();
                 if (validationResult.valid) {
+                    // Convert the form data for API request.
                     const apiRequest = {
                         title: this.newEvent.title,
                         description: this.newEvent.description,
@@ -103,20 +106,24 @@
                         startTime: moment.tz(this.newEvent.startTime, this.currentTimezone).toISOString(),
                         endTime: moment.tz(this.newEvent.endTime, this.currentTimezone).toISOString(),
                     }
+                    // API request to create an event.
                     httpHelper.doPostHttpCall<EventPartialApiResponse>(
                         '/api/event',
                         apiRequest,
                         httpHelper.getRequestHeader(),
                         this.cancelTokenSource!.token
                     ).then((resp) => {
+                        // On success, emit the saved event and close modal.
                         this.$emit('save', resp);
                         this.closeModal();
                     }).catch((error) => {
-                        // Handle error properly
+                        // Handle error properly.
                         console.log(error);
                     });
                 }
             },
+            // Format date based on whether it's an all-day event or specific time event.
+            // TODO: check to move this to an helper to avoid code repeat
             formatDate(value: string, allDay: boolean) {
                 const format = allDay ? 'YYYY-MM-DD' : 'YYYY-MM-DDTHH:mm';
                 return moment.tz(value, this.currentTimezone).format(format);
@@ -127,6 +134,7 @@
             },
         },
         watch: {
+            // Handle when the event property changes.
             event: {
                 deep: true,
                 immediate: true,
@@ -138,11 +146,13 @@
                 this.showModal = newVal;
             },
             showModal(newVal: boolean) {
-                if (newVal) {
+                if (newVal === true) {
                     this.formatEventDates();
                 }
+                // This is here to handle the case when we click outside of the modal to close it.
                 this.$emit('update:dialog', newVal);
             },
+            // When the allDay property of the event changes update the date format.
             'newEvent.allDay'() {
                 this.formatEventDates();
             },

@@ -57,15 +57,20 @@
             logout() {
                 this.errorMessage = '';
 
-                httpHelper.doPostHttpCall<loginResponse>('/api/account/logout', {}, {}, this.cancelTokenSource!.token!)
-                    .then(async () => {
-                        store.dispatch('user/purgeUserData');
-                        this.closeModal();
-                    })
-                    .catch(async (error) => {
-                        this.errorMessage = 'An error happened. Please try again later or contact an administrator.';
-                        console.log(error);
-                    })
+                // Make an HTTP POST call to log out the current logged in user.
+                httpHelper.doPostHttpCall<void>(
+                    '/api/account/logout',
+                    {},
+                    {},
+                    this.cancelTokenSource!.token!
+                ).then(async () => {
+                    // If successful, remove current user data from the store..
+                    store.dispatch('user/purgeUserData');
+                    this.closeModal();
+                }).catch(async (error) => {
+                    this.errorMessage = 'An error happened. Please try again later or contact an administrator.';
+                    console.log(error);
+                })
             },
         },
     });
