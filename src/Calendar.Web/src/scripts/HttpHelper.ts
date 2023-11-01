@@ -2,6 +2,12 @@ import axios from 'axios';
 import type { CancelToken, CancelTokenSource } from 'axios';
 import store from '../stores/Store';
 
+/**
+ * HttpHelper Utility:
+ * - Provides methods for HTTP requests using Axios (GET, POST, PUT, PATCH, DELETE).
+ * - Handles request cancellation and generate header (including token from the store).
+ * - Simplifies error handling for cancelled requests and other errors.
+ */
 export default {
     getCancelToken(): CancelTokenSource {
         return axios.CancelToken.source();

@@ -48,11 +48,12 @@
         },
         data() {
             return {
+                // Configuration options for FullCalendar.
                 calendarOptions: {
                     plugins: [
                         dayGridPlugin,
                         timeGridPlugin,
-                        interactionPlugin // needed for dateClick
+                        interactionPlugin // needed for dateClick.
                     ],
                     headerToolbar: {
                         left: 'prev today',
@@ -60,7 +61,7 @@
                         right: 'next'
                     },
                     initialView: store.state.calendarView.activeView,
-                    editable: false, // TODO: allow drag and drop and rezise 
+                    editable: false, // TODO: allow drag and drop and rezise.
                     selectable: true,
                     selectMirror: true,
                     dayMaxEvents: true,
@@ -81,15 +82,19 @@
             this.cancelTokenSource = httpHelper.getCancelToken();
         },
         computed: {
+            // Mapping state of activeView from store to keep track of the selected active view (monthly, weekly or daily)
             ...mapState('calendarView', ['activeView']),
             isUserLoggedIn(): boolean {
                 return store.getters['user/isLoggedIn'];
             },
+            // Access the FullCalendar's API
             getCalendarApi(): Calendar {
                 return (this.$refs.fullCalendar as typeof FullCalendar).getApi();
             },
         },
         methods: {
+            // Handler for when a date range is selected in the calendar,
+            // update eventToCreate to pass the selected date to create modal.
             handleDateSelect(selectInfo: DateSelectArg) {
                 selectInfo.view.calendar.unselect()
                 this.eventToCreate = {
@@ -99,6 +104,8 @@
                 };
                 this.showEventCreateDialog = true;
             },
+            // Handler for when an existing event is clicked in the calendar,
+            // get the eventId to pass to the event details modal.
             handleEventClick(clickInfo: EventClickArg) {
                 this.eventId = Number(clickInfo.event.id);
                 this.showEventDetailsDialog = true;
@@ -106,6 +113,7 @@
             handleEvents(events: EventApi[]) {
                 this.currentEvents = events
             },
+            // Transforms API response to a format that FullCalendar understands.
             transformToEventInput(apiResponseEvents: EventPartialApiResponse[]): EventInput[] {
                 return apiResponseEvents.map(event => ({
                     id: event.id.toString(),
@@ -115,12 +123,13 @@
                     allDay: event.allDay,
                 }));
             },
+            // Fetch events from the server for current logged in user and load them into the calendar.
             async fetchAndLoadEvents() {
                 httpHelper.doGetHttpCall<EventPartialApiResponse[]>(
                     '/api/event/events/range',
                     httpHelper.getRequestHeader(),
                     this.cancelTokenSource!.token,
-                    { 'startDate': '2023-10-1', 'endDate': '2023-11-1' }
+                    { 'startDate': '2023-11-1', 'endDate': '2023-12-1' } // todo: fetch current view date
                 ).then((resp) => {
                     this.getCalendarApi.addEventSource(this.transformToEventInput(resp));
                 }).catch((error) => {
@@ -134,6 +143,7 @@
             updateShowEventDetailsDialog(val: boolean) {
                 this.showEventDetailsDialog = val;
             },
+            // Add a new event to the calendar based on the value passed from the create modal.
             createEvent(newEvent: EventPartialApiResponse) {
                 this.getCalendarApi.addEvent({
                     id: newEvent.id.toString(),
@@ -145,9 +155,11 @@
             },
         },
         watch: {
+            // Change the calendar view based on the activeView from state. (related to mapState line 86)
             activeView(newView) {
                 this.getCalendarApi.changeView(newView);
             },
+            // Load events when a user logs in, remove them when they log out
             isUserLoggedIn(newValue) {
                 if (newValue === true) {
                     this.fetchAndLoadEvents();

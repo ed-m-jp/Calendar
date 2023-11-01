@@ -46,6 +46,7 @@
             };
         },
         computed: {
+            // Mapping state of username from store to display it if the user is logged in.
             ...mapState('user', ['username']),
             isUserLoggedIn(): boolean {
                 return store.getters['user/isLoggedIn'];
@@ -60,6 +61,7 @@
             }
         },
         watch: {
+            // Watching for changes in activeView and update activeView value in the store.
             activeView(newView) {
                 store.dispatch('calendarView/changeActiveView', newView);
             }

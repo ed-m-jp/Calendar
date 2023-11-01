@@ -40,6 +40,7 @@
     import store from '../stores/Store';
     // Types & Interfaces
     import type { componentData } from '../interfaces/LoginModalComponentDataType';
+    import type { loginResponse } from '../interfaces/LoginResponse';
 
     export default defineComponent({
         props: {
@@ -62,24 +63,29 @@
             this.cancelTokenSource = httpHelper.getCancelToken();
         },
         computed: {
+            // Checks if the username length meets a minimum requirement.
             isUsernameValid(): boolean {
                 return this.username.length >= 6;
             },
+            // Checks if the password meets the required criteria for strength.
             isPasswordValid(): boolean {
                 const hasDigit = /[0-9]/.test(this.password);
                 const hasLowercase = /[a-z]/.test(this.password);
                 const hasUppercase = /[A-Z]/.test(this.password);
                 return this.password.length >= 6 && hasDigit && hasLowercase && hasUppercase;
             },
+            // Ensure username and password are valid.
             isValid() {
                 return this.isUsernameValid && this.isPasswordValid;
             },
+            // Contains messages to be shown for various input scenarios.
             modalMessages() {
                 return {
                     userNameTooShort: 'Username must be at least 6 characters.',
                     passwordTooWeak: 'Password must have at least 6 characters, one digit, one lowercase and one uppercase letter.',
                 };
             },
+            // Preparing login/register request for API calls.
             userRequest() {
                 return {
                     Username: this.username,
@@ -101,22 +107,28 @@
                 } else {
                     console.log('Login with:', this.username, this.password);
 
-                    httpHelper.doPostHttpCall<loginResponse>('/api/account/login', this.userRequest, {}, this.cancelTokenSource!.token!)
-                        .then(async (resp) => {
-                            store.dispatch('user/updateUserInfo', resp);
-                            this.closeModal();
-                            this.submitted = false;
-                        })
-                        .catch(async (error) => {
-                            if (error.status === 400) {
-                                this.errorMessage = 'Invalid login details.';
-                            } else {
-                                this.errorMessage = 'An error happened. Please try again later or contact an administrator.';
-                            }
-                            console.log(error);
+                    // Making API call to try to log in based on provided credentials.
+                    httpHelper.doPostHttpCall<loginResponse>(
+                        '/api/account/login',
+                        this.userRequest,
+                        {},
+                        this.cancelTokenSource!.token!
+                    ).then(async (resp) => {
+                        // If successful, update user information in the store (JWT token + username).
+                        store.dispatch('user/updateUserInfo', resp);
+                        this.closeModal();
+                        this.submitted = false;
+                    }).catch(async (error) => {
+                        // Handle errors based on status code.
+                        if (error.status === 400) {
+                            this.errorMessage = 'Invalid login details.';
+                        } else {
+                            this.errorMessage = 'An error happened. Please try again later or contact an administrator.';
+                        }
+                        console.log(error);
 
-                            this.submitted = false;
-                        })
+                        this.submitted = false;
+                    })
                 }
             },
             register() {
@@ -125,14 +137,19 @@
                 if (!this.isValid) {
                     this.errorMessage = 'Invalid registration details.';
                 } else {
-                    httpHelper.doPostHttpCall<loginResponse>('/api/account/register', this.userRequest, {}, this.cancelTokenSource!.token!)
-                        .then(async (resp) => {
-                            console.log(resp);
-                        })
-                        .catch(async (error) => {
-                            console.log(error);
-                        })
-                    //this.closeModal();
+                    // Making API call to try to register a new user based on provided credentials.
+                    httpHelper.doPostHttpCall<loginResponse>(
+                        '/api/account/register',
+                        this.userRequest,
+                        {},
+                        this.cancelTokenSource!.token!
+                    ).then(async (resp) => {
+                        // TODO: handle success.
+                        console.log(resp);
+                    }).catch(async (error) => {
+                        // TODO: handle error.
+                        console.log(error);
+                    })
                 }
             },
         },

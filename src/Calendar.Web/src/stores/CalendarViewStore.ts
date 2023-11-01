@@ -1,5 +1,11 @@
 import type { ActionContext } from 'vuex';
 
+/**
+ * CalendarView Store:
+ * - Contains predefined calendar view constants (MONTH, WEEK, DAY).
+ * - Manages the active calendar view state.
+ * - Provides mutations and actions to modify the active calendar view.
+ */
 export const CALENDAR_VIEW = {
     MONTH: 'dayGridMonth',
     WEEK: 'timeGridWeek',

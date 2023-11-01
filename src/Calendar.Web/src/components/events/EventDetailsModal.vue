@@ -83,6 +83,7 @@
             this.cancelTokenSource = httpHelper.getCancelToken();
         },
         computed: {
+            // Determines type of date input (full date or date-time) based on whether the event is all day.
             dateInputType() {
                 return this.event.allDay ? 'date' : 'datetime-local';
             },
@@ -91,6 +92,8 @@
             closeModal() {
                 this.$emit('update:dialog', false);
             },
+            // Format date based on whether it's an all-day event or specific time event.
+            // TODO: check to move this to an helper to avoid code repeat
             formatDate(value: string, allDay: boolean) {
                 const format = allDay ? 'YYYY-MM-DD' : 'YYYY-MM-DDTHH:mm';
                 return moment.tz(value, this.currentTimezone).format(format);
@@ -101,6 +104,7 @@
             },
         },
         watch: {
+            // When the eventId property changes, fetch the event details from the API.
             eventId(newId: number) {
                 this.errorMessage = null;
                 httpHelper.doGetHttpCall<EventApiResponse>(
@@ -108,6 +112,7 @@
                     httpHelper.getRequestHeader(),
                     this.cancelTokenSource!.token
                 ).then((resp) => {
+                    // Update the event details from the API response
                     this.event = {
                         title: resp.title,
                         description: resp.description ?? '',
@@ -132,8 +137,10 @@
                 if (newVal) {
                     this.formatEventDates();
                 }
+                // This is here to handle the case when we click outside of the modal to close it.
                 this.$emit('update:dialog', newVal);
             },
+            // When the allDay property of the event changes update the date format.
             'newEvent.allDay'() {
                 this.formatEventDates();
             },
