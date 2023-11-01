@@ -88,9 +88,7 @@ namespace Calendar.Services.Services
             var validAudiences = jwtSettings.GetSection("validAudiences").Get<List<string>>();
 
             if (validAudiences!.Contains(origin))
-            {
                 return origin;
-            }
 
             throw new UnauthorizedAccessException("Unauthorized origin.");
         }

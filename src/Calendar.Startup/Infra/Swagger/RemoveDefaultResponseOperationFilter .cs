@@ -9,7 +9,7 @@ namespace Calendar.Startup.Infra.Swagger
         {
             foreach (var response in operation.Responses)
             {
-                // Check if it contains the ProblemDetails reference
+                // Check if it contains the ProblemDetails default reference and remove it.
                 if (response.Value.Content != null &&
                     response.Value.Content.TryGetValue("application/json", out var mediaType) &&
                     mediaType.Schema.Reference != null &&
@@ -20,5 +20,4 @@ namespace Calendar.Startup.Infra.Swagger
             }
         }
     }
-
 }

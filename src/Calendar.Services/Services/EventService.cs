@@ -40,9 +40,7 @@ namespace Calendar.Services.Services
                 = NormalizeStartAndEndTimes(createRequest.AllDay, createRequest.StartTime, createRequest.EndTime);
 
             if (IsStartDateAfterOrEqualToEndDate(createRequest.StartTime, createRequest.EndTime) == true)
-            {
                 return ServiceResult<EventResponse>.Unprocessable("Start time should be before end time.");
-            }
 
             var newEventEntity = _mapper.Map<Event>(createRequest);
             newEventEntity.UserId = userId!;
@@ -91,9 +89,7 @@ namespace Calendar.Services.Services
                 = NormalizeStartAndEndTimes(eventFromDb.Entity!.AllDay, eventFromDb.Entity!.StartTime, eventFromDb.Entity!.EndTime);
 
             if (IsStartDateAfterOrEqualToEndDate(eventFromDb.Entity!.StartTime, eventFromDb.Entity!.EndTime) == true)
-            {
                 return ServiceResult<EventResponse>.Unprocessable("Start time should be before end time.");
-            }
 
             // Save the updated entity to the DB
             var saveResult = await _EventRepository.UpdateAsync(eventFromDb.Entity!);
@@ -115,12 +111,10 @@ namespace Calendar.Services.Services
                 return ServiceResult<EventResponse>.Error($"Failed to Update Event for event id : [{eventId}].");
 
             (updateRequest.StartTime, updateRequest.EndTime)
-                    = NormalizeStartAndEndTimes(eventFromDb.Entity!.AllDay, updateRequest.StartTime, updateRequest.EndTime);
+                = NormalizeStartAndEndTimes(eventFromDb.Entity!.AllDay, updateRequest.StartTime, updateRequest.EndTime);
 
             if (IsStartDateAfterOrEqualToEndDate(updateRequest.StartTime, updateRequest.EndTime) == true)
-            {
                 return ServiceResult<EventResponse>.Unprocessable("Start time should be before end time.");
-            }
 
             try
             {
@@ -155,9 +149,7 @@ namespace Calendar.Services.Services
             [NotNull] DateTime startDate, [NotNull] DateTime endDate, [NotNull] string userId)
         {
             if (startDate.Date > endDate.Date)
-            {
                 return ServiceResult<IReadOnlyList<PartialEventResponse>>.BadRequest("start date must be inferior or equal to end date.");
-            }
 
             var getResult = await _EventRepository.GetEventsForUserBetweenDatesAsync(userId!, startDate, endDate);
 
