@@ -59,10 +59,10 @@
 
                 // Make an HTTP POST call to log out the current logged in user.
                 httpHelper.doPostHttpCall<void>(
-                    '/api/account/logout',
-                    {},
-                    {},
-                    this.cancelTokenSource!.token!
+                    '/api/account/logout',          // Endpoint url.
+                    {},                             // Request body.
+                    {},                             // Request header.
+                    this.cancelTokenSource!.token!  // Cancellation token.
                 ).then(async () => {
                     // If successful, remove current user data from the store..
                     store.dispatch('user/purgeUserData');

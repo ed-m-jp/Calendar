@@ -68,6 +68,7 @@
                 return this.username.length >= 6;
             },
             // Checks if the password meets the required criteria for strength.
+            // Need at least 1 uppercase, 1 lowercase, 1 number and minimum 6 characters.
             isPasswordValid(): boolean {
                 const hasDigit = /[0-9]/.test(this.password);
                 const hasLowercase = /[a-z]/.test(this.password);
@@ -105,19 +106,16 @@
                 if (!this.isValid) {
                     this.errorMessage = 'Invalid login details.';
                 } else {
-                    console.log('Login with:', this.username, this.password);
-
                     // Making API call to try to log in based on provided credentials.
                     httpHelper.doPostHttpCall<loginResponse>(
-                        '/api/account/login',
-                        this.userRequest,
-                        {},
-                        this.cancelTokenSource!.token!
+                        '/api/account/login',           // Endpoint url.
+                        this.userRequest,               // Request body.
+                        {},                             // Request header.
+                        this.cancelTokenSource!.token!  // Cancellation token.
                     ).then(async (resp) => {
                         // If successful, update user information in the store (JWT token + username).
                         store.dispatch('user/updateUserInfo', resp);
                         this.closeModal();
-                        this.submitted = false;
                     }).catch(async (error) => {
                         // Handle errors based on status code.
                         if (error.status === 400) {
@@ -126,7 +124,7 @@
                             this.errorMessage = 'An error happened. Please try again later or contact an administrator.';
                         }
                         console.log(error);
-
+                    }).finally(() => {
                         this.submitted = false;
                     })
                 }
@@ -139,16 +137,24 @@
                 } else {
                     // Making API call to try to register a new user based on provided credentials.
                     httpHelper.doPostHttpCall<loginResponse>(
-                        '/api/account/register',
-                        this.userRequest,
-                        {},
-                        this.cancelTokenSource!.token!
+                        '/api/account/register',        // Endpoint url.
+                        this.userRequest,               // Request body.
+                        {},                             // Request header.
+                        this.cancelTokenSource!.token!  // Cancellation token.
                     ).then(async (resp) => {
-                        // TODO: handle success.
-                        console.log(resp);
+                        // If successful, update information for newly created user in the store (JWT token + username).
+                        store.dispatch('user/updateUserInfo', resp);
+                        this.closeModal();
                     }).catch(async (error) => {
-                        // TODO: handle error.
+                        // Handle errors based on status code.
+                        if (error.status === 400) {
+                            this.errorMessage = 'Invalid login details.';
+                        } else {
+                            this.errorMessage = 'An error happened. Please try again later or contact an administrator.';
+                        }
                         console.log(error);
+                    }).finally(() => {
+                        this.submitted = false;
                     })
                 }
             },

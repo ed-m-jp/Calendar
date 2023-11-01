@@ -126,10 +126,10 @@
             // Fetch events from the server for current logged in user and load them into the calendar.
             async fetchAndLoadEvents() {
                 httpHelper.doGetHttpCall<EventPartialApiResponse[]>(
-                    '/api/event/events/range',
-                    httpHelper.getRequestHeader(),
-                    this.cancelTokenSource!.token,
-                    { 'startDate': '2023-11-1', 'endDate': '2023-12-1' } // todo: fetch current view date
+                    '/api/event/events/range',                              // Endpoint url.
+                    httpHelper.getRequestHeader(),                          // Request header.
+                    this.cancelTokenSource!.token,                          // Cancellation token.
+                    { 'startDate': '2023-11-1', 'endDate': '2023-12-1' }    // Query parameters. -> todo: fetch current view date
                 ).then((resp) => {
                     this.getCalendarApi.addEventSource(this.transformToEventInput(resp));
                 }).catch((error) => {
