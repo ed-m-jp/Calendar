@@ -129,7 +129,7 @@
                     '/api/event/events/range',
                     httpHelper.getRequestHeader(),
                     this.cancelTokenSource!.token,
-                    { 'startDate': '2023-11-1', 'endDate': '2023-12-1' } // todo: fetch current display
+                    { 'startDate': '2023-11-1', 'endDate': '2023-12-1' } // todo: fetch current view date
                 ).then((resp) => {
                     this.getCalendarApi.addEventSource(this.transformToEventInput(resp));
                 }).catch((error) => {
